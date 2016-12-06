@@ -63,8 +63,8 @@ int getGyro(){
   return 0;
 }
 
-bool driveInRange(){
-  return drivePID.inRange(250) && headingPID.inRange(250);
+bool driveInRange(int delay){
+  return drivePID.inRange(delay) && headingPID.inRange(delay);
 }
 
 void driveDistance(double distance){
@@ -72,8 +72,8 @@ void driveDistance(double distance){
 
 }
 
-bool turnInRange(){
-  return turnPID.inRange(250);
+bool turnInRange(int delay){
+  return turnPID.inRange(delay);
 }
 
 void turnAngle(int angle){

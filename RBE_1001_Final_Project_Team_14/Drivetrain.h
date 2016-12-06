@@ -23,9 +23,9 @@ int getAverageEncoder();
 void resetEncoders();
 int getGyro();
 //AUTO STUFF
-bool driveInRange();
+bool driveInRange(int delay);
 void driveDistance(double distance);
-bool turnInRange();
+bool turnInRange(int delay);
 void turnAngle(int angle);
 
 

@@ -22,11 +22,15 @@ void ControlLoops::scaleInput(double lowIn, double highIn, double lowOut, double
   this->highOut = highOut;
   valuesScaled = true;
 }
+double ControlLoops::getValue(){
+  return inputValue;
+}
 
 double ControlLoops::PID(double setpoint , double actual) {
   if(valuesScaled){
     actual = scale(actual);
   }
+  inputValue = actual;
 
   error = setpoint - actual;
   errorDeriv = (error - errorLast) / Dt;

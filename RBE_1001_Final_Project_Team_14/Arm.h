@@ -13,13 +13,11 @@ static Servo intake;
 
 void initArm(int leftPort, int rightPort, int intakePort, int potPort);
 void setArm(int angle);
+double getArm();
+bool armGood(int delay);
 void setIntakeIn();
 void setIntakeOut();
 void setIntakeOff();
 
 
 #endif
-
-
-
-

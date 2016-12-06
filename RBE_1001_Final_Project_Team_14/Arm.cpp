@@ -18,7 +18,13 @@ void initArm(int leftPort, int rightPort, int intakePort, int potPort) {
 void setArm(int angle) {
   armPID.PID(angle, analogRead(mPotPort));
 }
+double getArm() {
+  return armPID.getValue();
+}
 
+bool armGood(int delay){
+  return armPID.inRange(delay);
+}
 void setIntakeIn() {
   intake.write(180);
 }

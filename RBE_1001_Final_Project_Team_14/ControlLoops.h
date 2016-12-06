@@ -11,6 +11,8 @@ private:
   bool limitsSet = false, enabled = true;
   int triggerStart;
 
+  double inputValue;
+
   double  lowIn,  highIn,  lowOut,  highOut;
   bool valuesScaled = false;
 
@@ -32,6 +34,7 @@ public:
   bool inRange();
   bool inRange(int delay);
   void scaleInput(double lowIn, double highIn, double lowOut, double highOut);
+  double getValue();
 
 };
 
