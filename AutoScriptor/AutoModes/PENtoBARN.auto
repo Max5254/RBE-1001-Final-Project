@@ -1,0 +1,65 @@
+PENtoBARN(){
+
+int autoState = 0;
+switch(autoState){
+
+	case 1:
+		//Driving 24 inches
+		driveDistance(24);
+		if(driveInRange(250))
+			robotState = 2;
+		break;
+
+	case 2:
+		//Turning -90 degrees
+		turnAngle(-90);
+		if(turnInRange(250))
+			robotState = 3;
+		break;
+
+	case 3:
+		//Setting the intake to in
+		setIntakeIn();
+		//Driving 18 inches
+		driveDistance(18);
+		if(driveInRange(250))
+			robotState = 4;
+		break;
+
+	case 4:
+		//Setting the intake to off
+		setIntakeOff();
+		//Driving -18 inches
+		driveDistance(-18);
+		if(driveInRange(250))
+			robotState = 5;
+		break;
+
+	case 5:
+		//Turning 90 degrees
+		turnAngle(90);
+		if(turnInRange(250))
+			robotState = 6;
+		break;
+
+	case 6:
+		//Driving 36 inches
+		driveDistance(36);
+		if(driveInRange(250))
+			robotState = 7;
+		break;
+
+	case 7:
+		//Setting the arm top
+		setArm(top);
+		if(armGood(250))
+			robotState = 8;
+		break;
+
+	case 8:
+		tankDrive(0,0);
+		setIntakeOff();
+		break;
+
+	} //Done with switch
+} //Done with Auto

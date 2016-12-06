@@ -1,0 +1,8 @@
+drive 20
+turn -90
+intakeIn
+drive 10
+intakeOff
+drive -10
+turn 90
+drive 30

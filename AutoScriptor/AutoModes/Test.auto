@@ -1,0 +1,44 @@
+Test(){
+
+switch(autoState){
+
+	case 0:
+		driveDistance(20);
+		if(driveInRange(250))
+			robotState = 1;
+		break;
+
+	case 1:
+		turnAngle(-90);
+		if(turnInRange(250))
+			robotState = 2;
+		break;
+
+	case 2:
+		setIntakeIn();
+		driveDistance(10);
+		if(driveInRange(250))
+			robotState = 3;
+		break;
+
+	case 3:
+		setIntakeOff();
+		driveDistance(-10);
+		if(driveInRange(250))
+			robotState = 4;
+		break;
+
+	case 4:
+		turnAngle(90);
+		if(turnInRange(250))
+			robotState = 5;
+		break;
+
+	case 5:
+		driveDistance(30);
+		if(driveInRange(250))
+			robotState = 6;
+		break;
+
+	} //Done with switch
+} //Done with Auto

@@ -1,0 +1,10 @@
+drive 24
+turn -90
+intakeIn
+drive 18
+intakeOff
+drive -18
+turn 90
+drive 36
+arm top
+stop
