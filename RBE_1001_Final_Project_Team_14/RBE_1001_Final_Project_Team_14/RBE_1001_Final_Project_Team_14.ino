@@ -14,7 +14,13 @@
 #include <DFW.h> // DFW include
 #include <Servo.h> // servo library
 #include "Robot.h"
+#include <LiquidCrystal.h>
 
+// initialize the library with the numbers of the interface pins
+LiquidCrystal lcd(40,41,42,43,44,45);
+int autoPotPin = A1;
+int autoButtonPin = 22;
+bool colorRed;
 
 
 int ledpindebug = 13; //Wireless controller Debug pin. If lit then there is no communication.
@@ -26,45 +32,53 @@ Servo leftmotor; // Servo object
 void setup() {
   Serial.begin(9600); // Serial output begin. Only needed for debug
   dfw.begin(9600, 1); // Serial1 output begin for DFW library. Buad and port #."Serial1 only"
+  pinMode(autoButtonPin, INPUT_PULLUP);
+  lcd.begin(16, 2);
   while (dfw.start() == 0) { //waits for controller to init
     Serial.println("init");
     dfw.update();
     delay(20);
   }
   // put your setup code here, to run once:
-  //Drivetrain(1,2,3,4);
   initRobot();
 
 }
 
 void autonomous(volatile unsigned long time) // function definition
 {
-
+  Serial.println("Waiting for start"); //prints Teleop over serial (usb com port)
   while (dfw.start() == 1) { // waits for start button
-    Serial.println("waiting for start");
+    setAuto();
+    //Serial.println("waiting for start");
     dfw.update();
     delay(20);
   }
-
+  dfw.end();
+  Serial.println("Auto"); //prints Teleop over serial (usb com port)
+  lcd.clear();
+  resetEncoders();
   unsigned long startTime = millis(); // sets start time of autonomous
   time = time * 1000; // modifies milliseconds to seconds
   while ((millis() - startTime <= time) && (dfw.select())) // compares start time to time entered in the autonomous function and
   {
     // The select button can be used to skip the autonomous code.
     // Enter Autonomous User Code Here
+    printEncoders(0);
+    autonomousPeriodic(colorRed);
 
-    autonomousPeriodic();
-
-    Serial.println("Autonomous"); //prints Autonomous over serial (usb com port)
+    //Serial.println("Autonomous"); //prints Autonomous over serial (usb com port)
     dfw.update();//used for autonoumous skip
     delay(20); //delay to prevent spamming the serial port and to keep servo and dfw libraries happy
 
   }
+  dfw.begin(9600,1);
 }
 
 
 
 void teleop(unsigned long time) { // function definition
+  Serial.println("TeleOp"); //prints Teleop over serial (usb com port)
+  lcd.clear();
   unsigned long startTime2 = millis(); // sets start time of teleop
   time = time * 1000; // modifies milliseconds to seconds
   while (millis() - startTime2 <= time) // compares start time to time entered in the teleop function
@@ -73,9 +87,10 @@ void teleop(unsigned long time) { // function definition
     dfw.update();// Called to update the controllers output. Do not call faster than every 15ms.
     // Enter Teleop User Code Here
     teleopPeriodic(dfw);
+    printEncoders(0);
+    printPot(1);
 
 
-    Serial.println("TeleOp"); //prints Teleop over serial (usb com port)
     delay(20); //delay to prevent spamming the serial port
 
   }
@@ -85,8 +100,56 @@ void teleop(unsigned long time) { // function definition
 
 void loop() {
 
-  autonomous(20); //time in seconds to run autonomous code
-
-  teleop(180); //time in seconds that teleop code will run
+  autonomous(15); //time in seconds to run autonomous code
+  teleop(20000); //time in seconds that teleop code will run
 }
 
+
+///////////////////////
+//PRINTING TO THE LCD//
+///////////////////////
+void printEncoders(int line){
+  lcd.setCursor(0, line);
+  lcd.print("Enc: " + (String)getLeftEncoder() + " , " + (String)getRightEncoder());
+}
+void printGyro(int line){
+  lcd.setCursor(0, line);
+  lcd.print("Gyro: " + (String)getGyro());
+}
+void printPot(int line){
+  lcd.setCursor(0, line);
+  lcd.print("Pot: " + (String)getArm());
+}
+
+
+//TODO: make this be able to adapt to different amounts of auto modes
+//TODO: make this actually select an auto
+int potValue , autoRange, numAuto = 2;
+String desiredMode;
+void setAuto(){
+  //PRINTS THE AUTO MODE
+  lcd.setCursor(0, 0);
+  lcd.print("Auto: ");
+  potValue = analogRead(autoPotPin);
+  autoRange = 1023/numAuto;
+  if(potValue < autoRange){
+    desiredMode = "Do Nothing";
+  }
+  else if(potValue > autoRange){
+    desiredMode = "PEN to PEN";
+  }
+  lcd.setCursor(6, 0);
+  lcd.print(desiredMode);
+
+  //PRINTS THE COLOR
+  lcd.setCursor(0, 1);
+  lcd.print("Color: ");
+  lcd.setCursor(7,  1);
+  if(digitalRead(autoButtonPin)){
+    lcd.print("RED ");
+    colorRed = true;
+  } else {
+    colorRed = false;
+    lcd.print("BLUE");
+  }
+}

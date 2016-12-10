@@ -1,3 +1,4 @@
+init
 drive 24
 turn -90
 intakeIn

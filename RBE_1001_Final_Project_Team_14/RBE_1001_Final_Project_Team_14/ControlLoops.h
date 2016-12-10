@@ -6,10 +6,11 @@
 class ControlLoops{
 
 private:
-  double error, errorDeriv, errorLast, errorInt, PIDOutput, Dt, Kp, Ki, Kd;
+  double error, errorDeriv, errorLast, errorInt, PIDOutput, Kp, Ki, Kd;
+  const int Dt = 1;
   double lowLimit, upLimit, range = 0;
   bool limitsSet = false, enabled = true;
-  int triggerStart;
+  int mTriggerStart;
 
   double inputValue;
 
@@ -27,7 +28,7 @@ private:
 public:
   //ControlLoops();
   void setOutputLimits(double lowLimit, double upLimit);
-  void initPID(double Kp, double Ki, double Kd, double Dt);
+  void initPID(double Kp, double Ki, double Kd);
   double PID(double actual , double setpoint);
   void enablePID(bool enabled);
   void setAcceptableRange(double range);

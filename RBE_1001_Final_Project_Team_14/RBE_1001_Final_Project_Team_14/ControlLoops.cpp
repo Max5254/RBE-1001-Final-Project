@@ -8,11 +8,10 @@ void ControlLoops::setOutputLimits(double lowLimit, double upLimit){
   limitsSet = true;
 }
 
-void ControlLoops::initPID(double Kp, double Ki, double Kd, double Dt){
+void ControlLoops::initPID(double Kp, double Ki, double Kd){
   this->Kp = Kp;
   this->Ki = Ki;
   this->Kd = Kd;
-  this->Dt = Dt;
 }
 
 void ControlLoops::scaleInput(double lowIn, double highIn, double lowOut, double highOut){
@@ -39,8 +38,8 @@ double ControlLoops::PID(double setpoint , double actual) {
   if(PIDOutput > upLimit && limitsSet){ PIDOutput = upLimit;}
   if(PIDOutput < lowLimit && limitsSet){ PIDOutput = lowLimit;}
 
-  if(enabled){ return PIDOutput;
-  }else{ return 0;}
+  if(enabled){ return PIDOutput;}
+  else{ return 0;}
 
   errorLast = error;
 }
@@ -63,10 +62,10 @@ bool ControlLoops::inRange(int delay){
 
 bool ControlLoops::booleanDelay(bool latch, int delay){
   if(!latch){
-    triggerStart = millis();
+    mTriggerStart = millis();
     return false;
   } else {
-    return millis() - triggerStart > delay;
+    return millis() - mTriggerStart > delay;
   }
 }
 
