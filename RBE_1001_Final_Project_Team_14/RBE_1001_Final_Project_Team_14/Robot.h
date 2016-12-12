@@ -47,11 +47,11 @@ const double kArmBottomSetpoint = 0.08;
 const double kArmMiddleSetpoint = 0.12;
 const double kArmTopSetpoint = 0.4;
 //Arm
-const int kP_Arm = 1;
-const int kArmGoodRange = 0.05;
+const double kP_Arm = 1;
+const double kArmGoodRange = 0.05;
 //Drive auto
-const int kP_drive = 1;
-const int kDriveGoodRange = 0.5;
+const double kP_Drive = 0.1;
+const double kDriveGoodRange = 0.5;
 
 ///////////////
 // FUNCTIONS //
@@ -74,9 +74,9 @@ void setIntake(intakeState state);
 void initDrivetrain();
 void tankDrive(double leftInput, double rightInput);
 void arcadeDrive(double throttle, double turn);
-int getLeftEncoder();
-int getRightEncoder();
-int getAverageEncoder();
+double getLeftEncoder();
+double getRightEncoder();
+double getAverageEncoder();
 void resetEncoders();
 int getGyro();
 //Auto drivetrain functions

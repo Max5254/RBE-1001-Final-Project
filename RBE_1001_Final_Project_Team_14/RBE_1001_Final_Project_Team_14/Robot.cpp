@@ -55,7 +55,7 @@ void teleopPeriodic(DFW dfw){
 
 void autonomousPeriodic(bool colorRed){
 
-
+//driveDistance(24);
 }
 
 ///////////////
@@ -145,6 +145,7 @@ void initDrivetrain(){
   rightTopMotor.attach(driveTopRight, 1000, 2000);
   rightBottomMotor.attach(driveBottomRight, 1000, 2000);
   Serial.println("Drivetrain init");
+  pinMode(24, INPUT_PULLUP);
 }
 
 void tankDrive(double leftInput, double rightInput){
@@ -158,13 +159,15 @@ void arcadeDrive(double throttle, double turn){
     tankDrive(throttle - turn , throttle + turn);
 }
 
-int getLeftEncoder(){
+double getLeftEncoder(){
+  //return (leftEncoder.read() * 2.75 * 3.14) / 360;
   return leftEncoder.read();
 }
-int getRightEncoder(){
+double getRightEncoder(){
+  //return  (rightEncoder.read() * 2.75 * 3.14) / 360;
   return rightEncoder.read();
 }
-int getAverageEncoder(){
+double getAverageEncoder(){
   return (getRightEncoder() + getLeftEncoder()) / 2;
 }
 void resetEncoders(){
@@ -177,12 +180,24 @@ int getGyro(){
 }
 
 //AUTO DRIVE FUNCTIONS
-bool driveInRange(int delay){
-  return false;
-}
+//bool driveInRange(int delay){
+//  return false;
+//}
 
+double drivePower;
+bool driveGood = false;
 void driveDistance(double distance){
-
+  double driveError = distance - getAverageEncoder();
+  drivePower = driveError * kP_Drive;
+  driveGood = abs(driveError) < kDriveGoodRange;
+  if (drivePower > 1) drivePower = 1;
+  if (drivePower < -1) drivePower = -1;
+  if (driveGood || digitalRead(24) == 0){
+    drivePower = 0;
+  }
+  arcadeDrive(drivePower, 0);
+  //Serial.println(digitalRead(24));
+  Serial.println(drivePower);
 }
 
 bool turnInRange(int delay){

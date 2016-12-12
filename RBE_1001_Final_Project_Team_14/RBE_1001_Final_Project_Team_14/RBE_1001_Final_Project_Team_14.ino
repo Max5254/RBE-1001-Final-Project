@@ -67,7 +67,6 @@ void autonomous(volatile unsigned long time) // function definition
     autonomousPeriodic(colorRed);
 
     //Serial.println("Autonomous"); //prints Autonomous over serial (usb com port)
-    dfw.update();//used for autonoumous skip
     delay(20); //delay to prevent spamming the serial port and to keep servo and dfw libraries happy
 
   }
@@ -100,7 +99,7 @@ void teleop(unsigned long time) { // function definition
 
 void loop() {
 
-  autonomous(15); //time in seconds to run autonomous code
+  autonomous(60); //time in seconds to run autonomous code
   teleop(20000); //time in seconds that teleop code will run
 }
 
@@ -110,7 +109,9 @@ void loop() {
 ///////////////////////
 void printEncoders(int line){
   lcd.setCursor(0, line);
-  lcd.print("Enc: " + (String)getLeftEncoder() + " , " + (String)getRightEncoder());
+  lcd.print((String)getLeftEncoder() + " , " + (String)getRightEncoder());
+  lcd.setCursor(0, line + 1);
+  lcd.print((String)getAverageEncoder());
 }
 void printGyro(int line){
   lcd.setCursor(0, line);
