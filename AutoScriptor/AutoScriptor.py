@@ -22,11 +22,11 @@ printArray.append("switch(autoState){\n")
 def checkIntake():
 
     if (l[0:9] == "intakeOff"):
-        printArray.append("\t\tsetIntakeOff();  //Setting the intake to off")
+        printArray.append("\t\tsetIntake(OFF);  //Setting the intake to off")
     elif (l[0:8] == "intakeIn"):
-        printArray.append("\t\tsetIntakeIn();  //Setting the intake to in")
+        printArray.append("\t\tsetIntake(IN);  //Setting the intake to in")
     elif (l[0:9] == "intakeOut"):
-        printArray.append("\t\tsetIntakeOut();  //Setting the intake to out")
+        printArray.append("\t\tsetIntake(OUT);  //Setting the intake to out")
 
 #Checks if the current line is one containing an intake statment
 def intakeLine():
@@ -52,7 +52,7 @@ for l in lines:  #loop through each line in text file
         printArray.append("\t\tdriveDistance(" + l[6:] + ");  //Driving " + l[6:] + " inches")
         printArray.append("\t\tif(driveInRange(" + str(delayTime) + ")){")
         printArray.append("\t\t\tresetEncoders();")
-        printArray.append("\t\t\trobotState = " + str(robotState+1) + "; }")
+        printArray.append("\t\t\tautoState = " + str(robotState+1) + "; }")
 
     elif(l[0:4] == "turn"): #Turn, adds a case to determine which side of the field you're on and inverts angle if on blue
         printArray.append("\t\t//Turning " + l[5:] + " degrees")
@@ -60,22 +60,24 @@ for l in lines:  #loop through each line in text file
         printArray.append("\t\t\tturnAngle(" + l[5:] + ");")
         printArray.append("\t\t}else{")
         printArray.append("\t\t\tturnAngle(" + str(int(l[5:]) * -1) + ");}")
-        printArray.append("\t\tif(turnInRange(" + str(delayTime) + "))")
-        printArray.append("\t\t\trobotState = " + str(robotState + 1) + ";")
+        printArray.append("\t\tif(turnInRange(" + str(delayTime) + ")){")
+        printArray.append("\t\t\tautoState = " + str(robotState + 1) + ";")
+        printArray.append("\t\t\tresetEncoders();}")
 
     elif(l[0:3] == "arm"):  #Sets the arm to the specified variable
-        printArray.append("\t\tsetArm(" + l[4:] + ");  //Setting the arm " + l[4:])
+        printArray.append("\t\tsetArm(PID);")
+        printArray.append("\t\tarmSetpoint = " + l[4:] + ";  //Setting the arm " + l[4:])
         printArray.append("\t\tif(armGood(" + str(delayTime) + "))")
-        printArray.append("\t\t\trobotState = " + str(robotState + 1) + ";")
+        printArray.append("\t\t\tautoState = " + str(robotState + 1) + ";")
 
     elif(l[0:4] == "stop"):  #Stops the motors and stays in this state
         printArray.append("\t\ttankDrive(0,0);")
-        printArray.append("\t\tsetIntakeOff();")
+        printArray.append("\t\tsetIntake(OFF);")
 
     elif(l[0:4] == "init"):  #resets the encoders and moves to next case
         printArray.append("\t\ttankDrive(0,0);")
         printArray.append("\t\tresetEncoders();")
-        printArray.append("\t\trobotState = " + str(robotState + 1) + ";")
+        printArray.append("\t\tautoState = " + str(robotState + 1) + ";")
 
     elif(not intakeLine()): #If it's not a recognized line print that there is an error
         print("ERROR, LINE NOT VALID")

@@ -1,11 +1,9 @@
 init
-drive 24
+drive 20
 turn -90
-intakeIn
-drive 18
-intakeOff
-drive -18
+drive 22
 turn 90
-drive 36
-arm top
+intakeIn
+drive 24
+arm kArmTopSetpoint
 stop
