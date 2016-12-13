@@ -43,15 +43,17 @@ static Servo intake;
 ///////////////
 // CONSTANTS //
 ///////////////
-const double kArmBottomSetpoint = 0.08;
-const double kArmMiddleSetpoint = 0.12;
-const double kArmTopSetpoint = 0.4;
+const double kArmBottomSetpoint = 0.12;
+const double kArmMiddleSetpoint = 0.3;
+const double kArmTopSetpoint = 0.72;
 //Arm
-const double kP_Arm = 1;
+const double kP_Arm = 4.5;
 const double kArmGoodRange = 0.05;
 //Drive auto
 const double kP_Drive = 0.1;
-const double kDriveGoodRange = 0.5;
+const double kDriveGoodRange = 2.5;
+//Drive auto
+const double kTurnGoodRange = 2.5;
 
 ///////////////
 // FUNCTIONS //
@@ -66,8 +68,8 @@ void autonomousPeriodic(bool colorRed);
 void initArm();
 void setArm(armState state);
 double getArm();
-bool armGood();
-bool armGood(int delay);
+bool armInRange();
+bool armInRange(int delay);
 void setIntake(intakeState state);
 
 //DRIVETRAIN FUNCTIONS

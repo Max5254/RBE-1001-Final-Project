@@ -49,6 +49,7 @@ void autonomous(volatile unsigned long time) // function definition
   Serial.println("Waiting for start"); //prints Teleop over serial (usb com port)
   while (dfw.start() == 1) { // waits for start button
     setAuto();
+    //printPot(0);
     //Serial.println("waiting for start");
     dfw.update();
     delay(20);
@@ -64,6 +65,7 @@ void autonomous(volatile unsigned long time) // function definition
     // The select button can be used to skip the autonomous code.
     // Enter Autonomous User Code Here
     printEncoders(0);
+    printGyro(1);
     autonomousPeriodic(colorRed);
 
     //Serial.println("Autonomous"); //prints Autonomous over serial (usb com port)
@@ -99,7 +101,7 @@ void teleop(unsigned long time) { // function definition
 
 void loop() {
 
-  autonomous(60); //time in seconds to run autonomous code
+  //autonomous(1); //time in seconds to run autonomous code
   teleop(20000); //time in seconds that teleop code will run
 }
 
@@ -110,8 +112,8 @@ void loop() {
 void printEncoders(int line){
   lcd.setCursor(0, line);
   lcd.print((String)getLeftEncoder() + " , " + (String)getRightEncoder());
-  lcd.setCursor(0, line + 1);
-  lcd.print((String)getAverageEncoder());
+  //lcd.setCursor(0, line + 1);
+  //lcd.print((String)getAverageEncoder());
 }
 void printGyro(int line){
   lcd.setCursor(0, line);
