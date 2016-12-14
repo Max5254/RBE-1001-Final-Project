@@ -28,7 +28,7 @@ switch(autoState){
 		break;
 
 	case 3:
-		driveDistance(22);  //Driving 22 inches
+		driveDistance(24);  //Driving 24 inches
 		if(driveInRange(250)){
 			resetEncoders();
 			autoState = 4; }
@@ -46,21 +46,64 @@ switch(autoState){
 		break;
 
 	case 5:
-		setIntake(IN);  //Setting the intake to in
-		driveDistance(24);  //Driving 24 inches
+		driveDistance(12);  //Driving 12 inches
 		if(driveInRange(250)){
 			resetEncoders();
 			autoState = 6; }
 		break;
 
 	case 6:
-		setArm(PID);
-		armSetpoint = kArmTopSetpoint;  //Setting the arm kArmTopSetpoint
-		if(armGood(250))
-			autoState = 7;
+		setIntake(IN);  //Setting the intake to in
+		driveDistance(16);  //Driving 16 inches
+		if(driveInRange(250)){
+			resetEncoders();
+			autoState = 7; }
 		break;
 
 	case 7:
+		driveDistance(-5);  //Driving -5 inches
+		if(driveInRange(250)){
+			resetEncoders();
+			autoState = 8; }
+		break;
+
+	case 8:
+		//Turning -90 degrees
+		if(red){
+			turnAngle(-90);
+		}else{
+			turnAngle(90);}
+		if(turnInRange(250)){
+			autoState = 9;
+			resetEncoders();}
+		break;
+
+	case 9:
+		driveDistance(-30);  //Driving -30 inches
+		if(driveInRange(250)){
+			resetEncoders();
+			autoState = 10; }
+		break;
+
+	case 10:
+		//Turning -90 degrees
+		if(red){
+			turnAngle(-90);
+		}else{
+			turnAngle(90);}
+		if(turnInRange(250)){
+			autoState = 11;
+			resetEncoders();}
+		break;
+
+	case 11:
+		driveDistance(- 25);  //Driving - 25 inches
+		if(driveInRange(250)){
+			resetEncoders();
+			autoState = 12; }
+		break;
+
+	case 12:
 		tankDrive(0,0);
 		setIntake(OFF);
 		break;

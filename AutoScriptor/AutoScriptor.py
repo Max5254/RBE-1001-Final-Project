@@ -1,5 +1,5 @@
 #VARIABLES TO SET
-fileName = "PENtoBARN"   #file name
+fileName = "justBARN"   #file name
 robotState = 0   #inital state for robot
 delayTime = 250  #time that all functions must be in range for before moving on (passed to the booleanDelay function of the PID loops)
 
@@ -67,7 +67,7 @@ for l in lines:  #loop through each line in text file
     elif(l[0:3] == "arm"):  #Sets the arm to the specified variable
         printArray.append("\t\tsetArm(PID);")
         printArray.append("\t\tarmSetpoint = " + l[4:] + ";  //Setting the arm " + l[4:])
-        printArray.append("\t\tif(armGood(" + str(delayTime) + "))")
+        printArray.append("\t\tif(armInRange(" + str(delayTime) + "))")
         printArray.append("\t\t\tautoState = " + str(robotState + 1) + ";")
 
     elif(l[0:4] == "stop"):  #Stops the motors and stays in this state

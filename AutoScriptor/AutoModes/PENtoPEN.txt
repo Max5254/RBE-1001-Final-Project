@@ -6,9 +6,8 @@ turn 90
 drive 12
 intakeIn
 drive 16
-drive -5
-turn -90
-drive -30
-turn -90
-drive - 25
+drive -4
+arm kArmMiddleSetpoint
+drive 10
+intakeOut
 stop

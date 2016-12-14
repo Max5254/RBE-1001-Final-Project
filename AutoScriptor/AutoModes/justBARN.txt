@@ -1,0 +1,5 @@
+init
+drive -40
+arm kArmMiddleSetpoint
+arm kArmTopSetpoint
+stop

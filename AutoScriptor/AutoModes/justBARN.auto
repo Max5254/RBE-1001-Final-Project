@@ -1,0 +1,39 @@
+int autoState = 0;
+justBARN(bool red){
+
+switch(autoState){
+
+	case 0:
+		tankDrive(0,0);
+		resetEncoders();
+		autoState = 1;
+		break;
+
+	case 1:
+		driveDistance(-40);  //Driving -40 inches
+		if(driveInRange(250)){
+			resetEncoders();
+			autoState = 2; }
+		break;
+
+	case 2:
+		setArm(PID);
+		armSetpoint = kArmMiddleSetpoint;  //Setting the arm kArmMiddleSetpoint
+		if(armInRange(250))
+			autoState = 3;
+		break;
+
+	case 3:
+		setArm(PID);
+		armSetpoint = kArmTopSetpoint;  //Setting the arm kArmTopSetpoint
+		if(armInRange(250))
+			autoState = 4;
+		break;
+
+	case 4:
+		tankDrive(0,0);
+		setIntake(OFF);
+		break;
+
+	} //Done with switch
+} //Done with Auto
