@@ -9,8 +9,8 @@ void initRobot(){
   initDrivetrain();
 }
 
-double kP_Drive = 0.08; //old .1
-double kDriveGoodRange = 2;
+double kP_Drive = 0.085; //old .8
+double kDriveGoodRange = 1.8;
 const double kArmGoodRange = 0.15; //.08
 double kP_Arm = 4; //4.5
 
@@ -77,44 +77,114 @@ void autonomousPeriodic(bool red, int numAuto){
     case 3:
       justBARN(red);
       break;
-    }
-  } //Done with Auto
+    case 4:
+      test(red);
+      break;
+  }
+} //Done with Auto
+
+void test(bool red){
+  switch(autoState){
+    case 0:
+    enteringTeleop = false;
+    tankDrive(0,0);
+    resetEncoders();
+    autoState = 1;
+    break;
+    
+  case 1:
+    driveDistance(20.5);  //Driving 20.5 inches
+    if(driveInRange(250)){
+      //resetEncoders();
+      autoState = 3; }
+    break;
+
+  case 2:
+    //Turning -90 degrees
+    if(red){
+      turnAngle(-90);
+    }else{
+      turnAngle(90);}
+    if(turnInRange(250)){
+      autoState = 3;
+      }
+    break;
+  case 3:
+     if(digitalRead(barnButton) == 0){
+      autoState = 1;
+      resetEncoders();
+     }
+  }
+}
 
 void justBARN(bool red){
   switch(autoState){
+case 0:
+      enteringTeleop = true;
+      tankDrive(0,0);
+      resetEncoders();
+      autoState = 1;
+      break;
 
-	case 0:
-    enteringTeleop = true;
-    tankDrive(0,0);
-		resetEncoders();
-		autoState = 1;
-		break;
+    case 1:
+      driveDistance(-37);  //Driving 21 inches
+      if(driveInRange(250)){
+        resetEncoders();
+        autoState = 2; }
+      break;
+      
+    case 2:
+      //Turning -90 degrees
+      if(red){
+        turnAngle(60);
+      }else{
+        turnAngle(-60);}
+      if(turnInRange(250)){
+        autoState = 3;
+        resetEncoders();}
+      break;
 
-	case 1:
-		driveDistance(-30);  //Driving -40 inches
-		if(driveInRange(250)){
-			resetEncoders();
-			autoState = 2; }
-		break;
+    case 3:
+      kP_Drive = 0.15;
+      if(red){
+        driveDistance(-16);  //Driving 26 inches
+      }else{
+        driveDistance(-6);  //Driving 26 inches
+      }
+      if(driveInRange(250)){
+        resetEncoders();
+        autoState = 4; }
+      break;
 
-	case 2:
+    case 4:
+      //Turning 90 degrees
+      if(red){
+        turnAngle(-60);
+      }else{
+        turnAngle(60);}
+      if(turnInRange(250)){
+        autoState = 5;
+        resetEncoders();}
+      break;
+
+	case 5:
     arcadeDrive(-1, 0);
 		setArm(PID);
 		armSetpoint = 0.66;  //Setting the arm kArmMiddleSetpoint
 		if(digitalRead(barnButton) == 0){
-			autoState = 3;}
+			autoState = 6;}
 		break;
 
 
-	case 3:
+	case 6:
 		tankDrive(0,0);
     setArm(ManualUp);
     setIntake(OFF);
-    if(getArm() > 0.87){
-      autoState = 4; }
+    if(getArm() > 0.85){
+      autoState = 7; }
 		break;
 
-  case 4:
+  case 7:
     tankDrive(0,0);
     setArm(Off);
     break;
@@ -126,69 +196,69 @@ void justBARN(bool red){
 
 void PENtoPEN(bool red){
   switch(autoState){
-
-  case 0:
-    enteringTeleop = false;
-    tankDrive(0,0);
-    resetEncoders();
-    autoState = 1;
-    break;
-
-  case 1:
-    driveDistance(20.5);  //Driving 20 inches
-    if(driveInRange(250)){
+case 0:
+      enteringTeleop = true;
+      tankDrive(0,0);
       resetEncoders();
-      autoState = 2; }
-    break;
+      autoState = 1;
+      break;
 
-  case 2:
-    //Turning -90 degrees
+    case 1:
+      driveDistance(21.5);  //Driving 21 inches
+      if(driveInRange(250)){
+        resetEncoders();
+        autoState = 2; }
+      break;
+      
+    case 2:
+      //Turning -90 degrees
+      if(red){
+        turnAngle(-88);
+      }else{
+        turnAngle(90);}
+      if(turnInRange(250)){
+        autoState = 3;
+        resetEncoders();}
+      break;
+
+    case 3:
     if(red){
-      turnAngle(-90);
-    }else{
-      turnAngle(90);}
-    if(turnInRange(250)){
-      autoState = 3;
-      resetEncoders();}
-    break;
+      driveDistance(15);
+  }else{
+      driveDistance(26);  //Driving 26 inches
+  }
+      if(driveInRange(250)){
+        resetEncoders();
+        autoState = 4; }
+      break;
 
-  case 3:
-  if(red){
-    driveDistance(16); //12
-  } else {
-    driveDistance(24);
-  }  //Driving 22 inches
-    if(driveInRange(250)){
-      resetEncoders();
-      autoState = 4; }
-    break;
+    case 4:
+      //Turning 90 degrees
+      if(red){
+        turnAngle(90);
+      }else{
+        turnAngle(-90);}
+      if(turnInRange(250)){
+        autoState = 5;
+        resetEncoders();}
+      break;
 
-  case 4:
-    //Turning 90 degrees
-    if(red){
-      turnAngle(90);
-    }else{
-      turnAngle(-90);}
-    if(turnInRange(250)){
-      autoState = 5;
-      resetEncoders();}
-    break;
+    case 5:
+      kP_Drive = 0.15;
+      kDriveGoodRange = 2.5;
+      driveDistance(12);  //Driving 12 inches
+      if(driveInRange(250)){
+        resetEncoders();
+        autoState = 6; }
+      break;
 
-  case 5:
-    kP_Drive = 0.12;
-    driveDistance(12, 0.5);  //Driving 12 inches
-    if(driveInRange(250)){
-      resetEncoders();
-      autoState = 6; }
-    break;
-
-  case 6:
-    setIntake(IN);  //Setting the intake to in
-    driveDistance(16, 0.5);  //Driving 12 inches
-    if(driveInRange(250)){
-      resetEncoders();
-      autoState = 7; }
-    break;
+    case 6:
+      setIntake(IN);  //Setting the intake to in
+      driveDistance(16);  //Driving 16 inches
+      if(driveInRange(250)){
+        resetEncoders();
+        autoState = 7; }
+      break;
 
   case 7:
     driveDistance(-4);  //Driving -4 inches
@@ -200,7 +270,7 @@ void PENtoPEN(bool red){
   case 8:
     kP_Arm = 5;
     setArm(PID);
-    armSetpoint = 0.7;  //Setting the arm kArmMiddleSetpoint
+    armSetpoint = 0.58;  //Setting the arm kArmMiddleSetpoint
     if(armInRange(250))
       autoState = 9;
     break;
@@ -217,9 +287,53 @@ void PENtoPEN(bool red){
     setArm(Off);
     setIntake(OUT);  //Setting the intake to out
     tankDrive(0,0);
+    delay(3200);
+    autoState = 11;
     break;
-
-  } //Done with switch
+  case 11:
+    setArm(PID);
+    armSetpoint = 0.7;  //Setting the arm kArmMiddleSetpoint
+    setIntake(OFF);
+    driveDistance(-6);  //Driving -6 inches
+    if(driveInRange(250)){
+      resetEncoders();
+      autoState = 12; }
+    break;
+   case 12:
+   
+    setArm(Off);
+      //Turning -90 degrees
+      if(red){
+        turnAngle(-90);
+      }else{
+        turnAngle(90);}
+      if(turnInRange(250)){
+        autoState = 13;
+        resetEncoders();}
+      break;
+   case 13:
+   if(red){
+    driveDistance(-44);
+   }else{
+    driveDistance(-30);
+   }
+    if(driveInRange(250)){
+      resetEncoders();
+      autoState = 14; }
+    break;
+    case 14:
+   
+    setArm(Off);
+      //Turning -90 degrees
+      if(red){
+        turnAngle(-90);
+      }else{
+        turnAngle(90);}
+      if(turnInRange(250)){
+        autoState = 15;
+        resetEncoders();}
+      break;
+  }
 }
 void PENtoBARN(bool red){
   switch(autoState){
@@ -232,12 +346,12 @@ void PENtoBARN(bool red){
   		break;
 
   	case 1:
-  		driveDistance(20.5);  //Driving 20 inches
+  		driveDistance(21.5);  //Driving 21 inches
   		if(driveInRange(250)){
   			resetEncoders();
   			autoState = 2; }
   		break;
-
+      
   	case 2:
   		//Turning -90 degrees
   		if(red){
@@ -250,7 +364,7 @@ void PENtoBARN(bool red){
   		break;
 
   	case 3:
-  		driveDistance(24);  //Driving 24 inches
+  		driveDistance(26);  //Driving 26 inches
   		if(driveInRange(250)){
   			resetEncoders();
   			autoState = 4; }
@@ -305,7 +419,7 @@ void PENtoBARN(bool red){
   		break;
 
   	case 9:
-  		driveDistance(-28.5);  //Driving -28 inches
+  		driveDistance(-27.5);  //Driving -28 inches
   		if(driveInRange(250)){
   			resetEncoders();
   			autoState = 10; }
@@ -342,12 +456,12 @@ void PENtoBARN(bool red){
   case 13:
       arcadeDrive(0, 0);
       setArm(ManualUp);
-      if(getArm() > 0.87){ //.87
+      if(getArm() > 0.85){ //.87
         autoState = 15;
       }
       break;
   case 14:
-    if(getArm() > 0.88){ //.88
+    if(getArm() > 0.85){ //.88
     setArm(ManualDown);
     delay(150);
     }
@@ -492,12 +606,17 @@ int getGyro(){
 
 double drivePower;
 bool driveGood = false;
+double minDrivePower = .13;
+
 void driveDistance(double distance){
   double driveError = distance - getAverageEncoder();
   drivePower = driveError * kP_Drive;
   driveGood = abs(driveError) < kDriveGoodRange;
   if (drivePower > 1) drivePower = 1;
   if (drivePower < -1) drivePower = -1;
+    else if (!driveGood && abs(drivePower) < minDrivePower){
+    drivePower = minDrivePower*drivePower/abs(drivePower);
+  }
   if (driveGood || digitalRead(barnButton) == 0){
     drivePower = 0;
   }
@@ -512,6 +631,9 @@ void driveDistance(double distance, double maxSpeed){
   driveGood = abs(driveError) < kDriveGoodRange;
   if (drivePower > maxSpeed) maxSpeed = 1;
   if (drivePower < -maxSpeed) maxSpeed = -1;
+  else if (!driveGood && abs(drivePower) < minDrivePower){
+    drivePower = minDrivePower*drivePower/abs(drivePower);
+  }
   if (driveGood || digitalRead(barnButton) == 0){
     drivePower = 0;
   }
@@ -527,8 +649,9 @@ bool driveInRange(int delay){
   return booleanDelay(driveGood,delay);
 }
 
-const double kP_Turn = 0.085; //old .08
-const double kTurnGoodRange = 2.5;
+const double kP_Turn = 0.07; //old .08
+const double kTurnGoodRange = 1.1;
+const double minTurnPower = .3;
 
 double turnPower;
 bool turnGood = false;
@@ -537,7 +660,10 @@ void turnAngle(int angle){
   turnPower = turnError * -kP_Turn;
   turnGood = abs(turnError) < kTurnGoodRange;
   if (turnPower > 1) turnPower = 1;
-  if (turnPower < -1) turnPower = -1;
+  else if (turnPower < -1) turnPower = -1;
+  else if (!turnGood && abs(turnPower) < minTurnPower){
+    turnPower = minTurnPower*turnPower/abs(turnPower);
+  }
   if (turnGood || digitalRead(barnButton) == 0){
     turnPower = 0;
   }

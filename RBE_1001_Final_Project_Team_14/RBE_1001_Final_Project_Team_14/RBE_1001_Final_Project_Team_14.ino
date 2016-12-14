@@ -21,7 +21,7 @@ LiquidCrystal lcd(40,41,42,43,44,45);
 int autoPotPin = A1;
 int autoButtonPin = 22, autoTogglePin = 27;
 bool colorRed;
-int currentAuto = 1, numAuto = 3;
+int currentAuto = 1, numAuto = 4;
 
 
 
@@ -154,6 +154,9 @@ void setAuto(){
   }
   else if(currentAuto == 3){
     desiredMode = "justBARN ";
+  }
+  else if(currentAuto == 4){
+    desiredMode = "test";
   }
   lcd.setCursor(6, 0);
   lcd.print(desiredMode);

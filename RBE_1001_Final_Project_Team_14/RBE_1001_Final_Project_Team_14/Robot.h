@@ -87,6 +87,7 @@ void turnAngle(int angle);
 void PENtoBARN(bool red);
 void PENtoPEN(bool red);
 void justBARN(bool red);
+void test(bool red);
 
 
 
