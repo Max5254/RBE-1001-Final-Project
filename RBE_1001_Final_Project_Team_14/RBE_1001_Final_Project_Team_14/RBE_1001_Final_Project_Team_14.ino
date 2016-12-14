@@ -19,8 +19,10 @@
 // initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(40,41,42,43,44,45);
 int autoPotPin = A1;
-int autoButtonPin = 22;
+int autoButtonPin = 22, autoTogglePin = 27;
 bool colorRed;
+int currentAuto = 1, numAuto = 3;
+
 
 
 int ledpindebug = 13; //Wireless controller Debug pin. If lit then there is no communication.
@@ -33,6 +35,8 @@ void setup() {
   Serial.begin(9600); // Serial output begin. Only needed for debug
   dfw.begin(9600, 1); // Serial1 output begin for DFW library. Buad and port #."Serial1 only"
   pinMode(autoButtonPin, INPUT_PULLUP);
+  pinMode(autoTogglePin, INPUT_PULLUP);
+
   lcd.begin(16, 2);
   while (dfw.start() == 0) { //waits for controller to init
     Serial.println("init");
@@ -66,7 +70,7 @@ void autonomous(volatile unsigned long time) // function definition
     // Enter Autonomous User Code Here
     printEncoders(0);
     printGyro(1);
-    autonomousPeriodic(colorRed);
+    autonomousPeriodic(colorRed, currentAuto);
 
     //Serial.println("Autonomous"); //prints Autonomous over serial (usb com port)
     delay(20); //delay to prevent spamming the serial port and to keep servo and dfw libraries happy
@@ -127,23 +131,33 @@ void printPot(int line){
 
 //TODO: make this be able to adapt to different amounts of auto modes
 //TODO: make this actually select an auto
-int potValue , autoRange, numAuto = 2;
 String desiredMode;
+bool buttonPressed, lastPressed;
 void setAuto(){
   //PRINTS THE AUTO MODE
   lcd.setCursor(0, 0);
   lcd.print("Auto: ");
-  potValue = analogRead(autoPotPin);
-  autoRange = 1023/numAuto;
-  if(potValue < autoRange){
-    desiredMode = "Do Nothing";
+  buttonPressed = digitalRead(autoTogglePin);
+
+  if(buttonPressed == 0 && lastPressed == 1){
+    if(currentAuto == numAuto){
+      currentAuto = 1;
+    } else {
+    currentAuto += 1;
   }
-  else if(potValue > autoRange){
-    desiredMode = "PEN to PEN";
+}
+  if (currentAuto == 1){
+    desiredMode = "PENtoBARN";
+  }
+  else if(currentAuto == 2){
+    desiredMode = "PENtoPEN ";
+  }
+  else if(currentAuto == 3){
+    desiredMode = "justBARN ";
   }
   lcd.setCursor(6, 0);
   lcd.print(desiredMode);
-
+  lastPressed = buttonPressed;
   //PRINTS THE COLOR
   lcd.setCursor(0, 1);
   lcd.print("Color: ");

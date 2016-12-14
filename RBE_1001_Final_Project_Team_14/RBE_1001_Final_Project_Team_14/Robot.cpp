@@ -11,7 +11,10 @@ void initRobot(){
 
 double kP_Drive = 0.08; //old .1
 double kDriveGoodRange = 2;
-bool enteringTeleop = true;
+const double kArmGoodRange = 0.15; //.08
+double kP_Arm = 4; //4.5
+
+bool enteringTeleop;
 void teleopPeriodic(DFW dfw){
   //DRIVE
   //tankDrive(servoToFrc(dfw.joysticklv()) ,servoToFrc(dfw.joystickrv()));
@@ -70,21 +73,177 @@ void teleopPeriodic(DFW dfw){
   else{
     setArm(Off);
   }
-  Serial.println(digitalRead(24));
+  Serial.println(digitalRead(barnButton));
 }
 
 int autoState = 0;
-void autonomousPeriodic(bool red){
+void autonomousPeriodic(bool red, int numAuto){
+  switch(numAuto){
+    case 1:
+      PENtoBARN(red);
+      break;
+    case 2:
+      PENtoPEN(red);
+      break;
+    case 3:
+      justBARN(red);
+      break;
+    }
+  } //Done with Auto
+
+void justBARN(bool red){
+  switch(autoState){
+
+	case 0:
+    enteringTeleop = true;
+    tankDrive(0,0);
+		resetEncoders();
+		autoState = 1;
+		break;
+
+	case 1:
+		driveDistance(-30);  //Driving -40 inches
+		if(driveInRange(250)){
+			resetEncoders();
+			autoState = 2; }
+		break;
+
+	case 2:
+    arcadeDrive(-1, 0);
+		setArm(PID);
+		armSetpoint = 0.66;  //Setting the arm kArmMiddleSetpoint
+		if(digitalRead(barnButton) == 0){
+			autoState = 3;}
+		break;
+
+
+	case 3:
+		tankDrive(0,0);
+    setArm(ManualUp);
+    setIntake(OFF);
+    if(getArm() > 0.92){
+      autoState = 4; }
+		break;
+
+  case 4:
+    tankDrive(0,0);
+    setArm(Off);
+    break;
+
+
+	} //Done with switch
+
+}
+
+void PENtoPEN(bool red){
+  switch(autoState){
+
+  case 0:
+    enteringTeleop = false;
+    tankDrive(0,0);
+    resetEncoders();
+    autoState = 1;
+    break;
+
+  case 1:
+    driveDistance(20.5);  //Driving 20 inches
+    if(driveInRange(250)){
+      resetEncoders();
+      autoState = 2; }
+    break;
+
+  case 2:
+    //Turning -90 degrees
+    if(red){
+      turnAngle(-90);
+    }else{
+      turnAngle(90);}
+    if(turnInRange(250)){
+      autoState = 3;
+      resetEncoders();}
+    break;
+
+  case 3:
+  if(red){
+    driveDistance(16); //12
+  } else {
+    driveDistance(24);
+  }  //Driving 22 inches
+    if(driveInRange(250)){
+      resetEncoders();
+      autoState = 4; }
+    break;
+
+  case 4:
+    //Turning 90 degrees
+    if(red){
+      turnAngle(90);
+    }else{
+      turnAngle(-90);}
+    if(turnInRange(250)){
+      autoState = 5;
+      resetEncoders();}
+    break;
+
+  case 5:
+    kP_Drive = 0.12;
+    driveDistance(12, 0.5);  //Driving 12 inches
+    if(driveInRange(250)){
+      resetEncoders();
+      autoState = 6; }
+    break;
+
+  case 6:
+    setIntake(IN);  //Setting the intake to in
+    driveDistance(16, 0.5);  //Driving 12 inches
+    if(driveInRange(250)){
+      resetEncoders();
+      autoState = 7; }
+    break;
+
+  case 7:
+    driveDistance(-4);  //Driving -4 inches
+    if(driveInRange(250)){
+      resetEncoders();
+      autoState = 8; }
+    break;
+
+  case 8:
+    kP_Arm = 5;
+    setArm(PID);
+    armSetpoint = 0.7;  //Setting the arm kArmMiddleSetpoint
+    if(armInRange(250))
+      autoState = 9;
+    break;
+
+  case 9:
+    setArm(PID);
+    driveDistance(10);  //Driving 8 inches
+    if(driveInRange(250)){
+      resetEncoders();
+      autoState = 10; }
+    break;
+
+  case 10:
+    setArm(Off);
+    setIntake(OUT);  //Setting the intake to out
+    tankDrive(0,0);
+    break;
+
+  } //Done with switch
+}
+void PENtoBARN(bool red){
   switch(autoState){
 
   	case 0:
-  		tankDrive(0,0);
+      enteringTeleop = true;
+      tankDrive(0,0);
   		resetEncoders();
   		autoState = 1;
   		break;
 
   	case 1:
-  		driveDistance(20);  //Driving 20 inches
+  		driveDistance(20.5);  //Driving 20 inches
   		if(driveInRange(250)){
   			resetEncoders();
   			autoState = 2; }
@@ -157,7 +316,7 @@ void autonomousPeriodic(bool red){
   		break;
 
   	case 9:
-  		driveDistance(-28);  //Driving -30 inches
+  		driveDistance(-28.5);  //Driving -28 inches
   		if(driveInRange(250)){
   			resetEncoders();
   			autoState = 10; }
@@ -178,7 +337,7 @@ void autonomousPeriodic(bool red){
       armSetpoint = 0.66;
       setArm(PID);
       driveDistance(- 20);  //Driving - 25 inches
-  		if(driveInRange(250) || digitalRead(24) == 0){
+  		if(driveInRange(250) || digitalRead(barnButton) == 0){
   			resetEncoders();
   			autoState = 12; }
   		break;
@@ -187,19 +346,19 @@ void autonomousPeriodic(bool red){
       armSetpoint = 0.66;
       setArm(PID);
       arcadeDrive(-1, 0);
-      if(digitalRead(24) == 0){
+      if(digitalRead(barnButton) == 0){
         autoState = 13;
       }
       break;
   case 13:
       arcadeDrive(0, 0);
       setArm(ManualUp);
-      if(getArm() > 0.92){
-        autoState = 14;
+      if(getArm() > 0.84){ //.92
+        autoState = 15;
       }
       break;
   case 14:
-    if(getArm() > 0.9){
+    if(getArm() > 0.84){
     setArm(ManualDown);
     delay(150);
     }
@@ -208,10 +367,12 @@ void autonomousPeriodic(bool red){
 
     break;
 
+    case 15:
+    setArm(Off);
+    break;
+
   	} //Done with switch
-  } //Done with Auto
-
-
+}
 
 
 ///////////////
@@ -229,8 +390,7 @@ void initArm() {
 
 }
 
-const double kArmGoodRange = 0.15; //.08
-const double kP_Arm = 4; //4.5
+
 
 void setArm(armState state) {
 
@@ -306,7 +466,7 @@ void initDrivetrain(){
   rightTopMotor.attach(driveTopRight, 1000, 2000);
   rightBottomMotor.attach(driveBottomRight, 1000, 2000);
   Serial.println("Drivetrain init");
-  pinMode(24, INPUT_PULLUP);
+  pinMode(barnButton, INPUT_PULLUP);
 }
 
 void tankDrive(double leftInput, double rightInput){
@@ -349,11 +509,11 @@ void driveDistance(double distance){
   driveGood = abs(driveError) < kDriveGoodRange;
   if (drivePower > 1) drivePower = 1;
   if (drivePower < -1) drivePower = -1;
-  if (driveGood || digitalRead(24) == 0){
+  if (driveGood || digitalRead(barnButton) == 0){
     drivePower = 0;
   }
   arcadeDrive(drivePower, 0);
-  //Serial.println(digitalRead(24));
+  //Serial.println(digitalRead(barnButton));
   //Serial.println(drivePower);
 }
 
@@ -363,11 +523,11 @@ void driveDistance(double distance, double maxSpeed){
   driveGood = abs(driveError) < kDriveGoodRange;
   if (drivePower > maxSpeed) maxSpeed = 1;
   if (drivePower < -maxSpeed) maxSpeed = -1;
-  if (driveGood || digitalRead(24) == 0){
+  if (driveGood || digitalRead(barnButton) == 0){
     drivePower = 0;
   }
   arcadeDrive(drivePower, 0);
-  //Serial.println(digitalRead(24));
+  //Serial.println(digitalRead(barnButton));
   //Serial.println(drivePower);
 }
 
@@ -389,7 +549,7 @@ void turnAngle(int angle){
   turnGood = abs(turnError) < kTurnGoodRange;
   if (turnPower > 1) turnPower = 1;
   if (turnPower < -1) turnPower = -1;
-  if (turnGood || digitalRead(24) == 0){
+  if (turnGood || digitalRead(barnButton) == 0){
     turnPower = 0;
   }
   arcadeDrive(0, turnPower);

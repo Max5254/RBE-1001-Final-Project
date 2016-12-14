@@ -44,7 +44,7 @@ static Servo intake;
 // CONSTANTS //
 ///////////////
 const double kArmBottomSetpoint = 0.34;
-const double kArmMiddleSetpoint = 0.48;
+const double kArmMiddleSetpoint = 0.7;
 const double kArmTopSetpoint = 0.9;
 //Arm
 //Drive auto
@@ -58,7 +58,7 @@ const double kArmTopSetpoint = 0.9;
 //General robot functions
 void initRobot();
 void teleopPeriodic(DFW dfw);
-void autonomousPeriodic(bool colorRed);
+void autonomousPeriodic(bool colorRed, int numAuto);
 
 //ARM FUNCITONS
 void initArm();
@@ -83,6 +83,11 @@ void driveDistance(double distance);
 void driveDistance(double distance, double maxSpeed);
 bool turnInRange(int delay);
 void turnAngle(int angle);
+
+void PENtoBARN(bool red);
+void PENtoPEN(bool red);
+void justBARN(bool red);
+
 
 
 
