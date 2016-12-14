@@ -106,7 +106,7 @@ void teleop(unsigned long time) { // function definition
 void loop() {
 
   autonomous(20); //time in seconds to run autonomous code
-  teleop(20000); //time in seconds that teleop code will run
+  teleop(180); //time in seconds that teleop code will run
 }
 
 

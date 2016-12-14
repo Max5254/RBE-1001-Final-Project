@@ -46,28 +46,17 @@ void teleopPeriodic(DFW dfw){
     setIntake(OFF);
   }
 
-  if(dfw.up() == 0){
+  if(dfw.up() == 0 || dfw.l1() == 0){
     setArm(ManualUp);
     enteringTeleop = false;
   }
-  else if(dfw.down() == 0){
+  else if(dfw.down() == 0 || dfw.l2() == 0){
     setArm(ManualDown);
     enteringTeleop = false;
   }
   else if (enteringTeleop){
+    kP_Arm = 6;
     armSetpoint = 0.73;
-    setArm(PID);
-  }
-  else if(dfw.r2() == 0){
-    armSetpoint = kArmBottomSetpoint;
-    setArm(PID);
-  }
-  else if(dfw.r1() == 0){
-    armSetpoint = kArmTopSetpoint;
-    setArm(PID);
-  }
-  else if(dfw.l1() == 0){
-    armSetpoint = kArmMiddleSetpoint;
     setArm(PID);
   }
   else{
@@ -121,7 +110,7 @@ void justBARN(bool red){
 		tankDrive(0,0);
     setArm(ManualUp);
     setIntake(OFF);
-    if(getArm() > 0.92){
+    if(getArm() > 0.87){
       autoState = 4; }
 		break;
 
@@ -353,12 +342,12 @@ void PENtoBARN(bool red){
   case 13:
       arcadeDrive(0, 0);
       setArm(ManualUp);
-      if(getArm() > 0.84){ //.92
+      if(getArm() > 0.87){ //.87
         autoState = 15;
       }
       break;
   case 14:
-    if(getArm() > 0.84){
+    if(getArm() > 0.88){ //.88
     setArm(ManualDown);
     delay(150);
     }
