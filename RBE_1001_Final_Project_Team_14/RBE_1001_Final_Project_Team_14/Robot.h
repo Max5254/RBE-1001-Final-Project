@@ -43,17 +43,13 @@ static Servo intake;
 ///////////////
 // CONSTANTS //
 ///////////////
-const double kArmBottomSetpoint = 0.12;
-const double kArmMiddleSetpoint = 0.3;
-const double kArmTopSetpoint = 0.72;
+const double kArmBottomSetpoint = 0.34;
+const double kArmMiddleSetpoint = 0.48;
+const double kArmTopSetpoint = 0.9;
 //Arm
-const double kP_Arm = 4.5;
-const double kArmGoodRange = 0.05;
 //Drive auto
-const double kP_Drive = 0.1;
-const double kDriveGoodRange = 2.5;
+
 //Drive auto
-const double kTurnGoodRange = 2.5;
 
 ///////////////
 // FUNCTIONS //
@@ -84,6 +80,7 @@ int getGyro();
 //Auto drivetrain functions
 bool driveInRange(int delay);
 void driveDistance(double distance);
+void driveDistance(double distance, double maxSpeed);
 bool turnInRange(int delay);
 void turnAngle(int angle);
 

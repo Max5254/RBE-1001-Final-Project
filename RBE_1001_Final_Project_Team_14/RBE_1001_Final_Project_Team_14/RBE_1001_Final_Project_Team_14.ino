@@ -90,7 +90,7 @@ void teleop(unsigned long time) { // function definition
     teleopPeriodic(dfw);
     printEncoders(0);
     printPot(1);
-
+    //lcd.print("Teleop");
 
     delay(20); //delay to prevent spamming the serial port
 
@@ -101,7 +101,7 @@ void teleop(unsigned long time) { // function definition
 
 void loop() {
 
-  //autonomous(1); //time in seconds to run autonomous code
+  autonomous(20); //time in seconds to run autonomous code
   teleop(20000); //time in seconds that teleop code will run
 }
 

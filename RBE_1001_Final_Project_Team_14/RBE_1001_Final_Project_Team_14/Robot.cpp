@@ -9,7 +9,9 @@ void initRobot(){
   initDrivetrain();
 }
 
-
+double kP_Drive = 0.08; //old .1
+double kDriveGoodRange = 2;
+bool enteringTeleop = true;
 void teleopPeriodic(DFW dfw){
   //DRIVE
   //tankDrive(servoToFrc(dfw.joysticklv()) ,servoToFrc(dfw.joystickrv()));
@@ -43,23 +45,32 @@ void teleopPeriodic(DFW dfw){
 
   if(dfw.up() == 0){
     setArm(ManualUp);
+    enteringTeleop = false;
   }
   else if(dfw.down() == 0){
     setArm(ManualDown);
+    enteringTeleop = false;
+  }
+  else if (enteringTeleop){
+    armSetpoint = 0.73;
+    setArm(PID);
   }
   else if(dfw.r2() == 0){
     armSetpoint = kArmBottomSetpoint;
+    setArm(PID);
   }
   else if(dfw.r1() == 0){
     armSetpoint = kArmTopSetpoint;
+    setArm(PID);
   }
   else if(dfw.l1() == 0){
     armSetpoint = kArmMiddleSetpoint;
+    setArm(PID);
   }
   else{
     setArm(Off);
   }
-  Serial.println(armSetpoint);
+  Serial.println(digitalRead(24));
 }
 
 int autoState = 0;
@@ -91,7 +102,7 @@ void autonomousPeriodic(bool red){
   		break;
 
   	case 3:
-  		driveDistance(22);  //Driving 22 inches
+  		driveDistance(24);  //Driving 24 inches
   		if(driveInRange(250)){
   			resetEncoders();
   			autoState = 4; }
@@ -109,16 +120,93 @@ void autonomousPeriodic(bool red){
   		break;
 
   	case 5:
-  		setIntake(IN);  //Setting the intake to in
-  		driveDistance(24);  //Driving 24 inches
+      kP_Drive = 0.15;
+      kDriveGoodRange = 2.5;
+      driveDistance(12);  //Driving 12 inches
   		if(driveInRange(250)){
   			resetEncoders();
   			autoState = 6; }
   		break;
 
   	case 6:
-  		tankDrive(0,0);
+      setIntake(IN);  //Setting the intake to in
+  		driveDistance(16);  //Driving 16 inches
+  		if(driveInRange(250)){
+  			resetEncoders();
+  			autoState = 7; }
   		break;
+
+  	case 7:
+      kP_Drive = 0.08;
+      driveDistance(-4);  //Driving -5 inches
+  		if(driveInRange(250)){
+  			resetEncoders();
+  			autoState = 8; }
+  		break;
+
+  	case 8:
+  		//Turning -90 degrees
+      setIntake(OFF);
+      if(red){
+  			turnAngle(-90);
+  		}else{
+  			turnAngle(90);}
+  		if(turnInRange(250)){
+  			autoState = 9;
+  			resetEncoders();}
+  		break;
+
+  	case 9:
+  		driveDistance(-28);  //Driving -30 inches
+  		if(driveInRange(250)){
+  			resetEncoders();
+  			autoState = 10; }
+  		break;
+
+  	case 10:
+  		//Turning -90 degrees
+  		if(red){
+  			turnAngle(-90);
+  		}else{
+  			turnAngle(90);}
+  		if(turnInRange(250)){
+  			autoState = 12;
+  			resetEncoders();}
+  		break;
+
+  	case 11:
+      armSetpoint = 0.66;
+      setArm(PID);
+      driveDistance(- 20);  //Driving - 25 inches
+  		if(driveInRange(250) || digitalRead(24) == 0){
+  			resetEncoders();
+  			autoState = 12; }
+  		break;
+
+  	case 12:
+      armSetpoint = 0.66;
+      setArm(PID);
+      arcadeDrive(-1, 0);
+      if(digitalRead(24) == 0){
+        autoState = 13;
+      }
+      break;
+  case 13:
+      arcadeDrive(0, 0);
+      setArm(ManualUp);
+      if(getArm() > 0.92){
+        autoState = 14;
+      }
+      break;
+  case 14:
+    if(getArm() > 0.9){
+    setArm(ManualDown);
+    delay(150);
+    }
+    else {
+      setArm(ManualUp);}
+
+    break;
 
   	} //Done with switch
   } //Done with Auto
@@ -140,6 +228,9 @@ void initArm() {
   Serial.println("Arm init"); //prints Teleop over serial (usb com port)
 
 }
+
+const double kArmGoodRange = 0.15; //.08
+const double kP_Arm = 4; //4.5
 
 void setArm(armState state) {
 
@@ -248,6 +339,8 @@ int getGyro(){
 }
 
 //AUTO DRIVE FUNCTIONS
+
+
 double drivePower;
 bool driveGood = false;
 void driveDistance(double distance){
@@ -263,11 +356,31 @@ void driveDistance(double distance){
   //Serial.println(digitalRead(24));
   //Serial.println(drivePower);
 }
+
+void driveDistance(double distance, double maxSpeed){
+  double driveError = distance - getAverageEncoder();
+  drivePower = driveError * kP_Drive;
+  driveGood = abs(driveError) < kDriveGoodRange;
+  if (drivePower > maxSpeed) maxSpeed = 1;
+  if (drivePower < -maxSpeed) maxSpeed = -1;
+  if (driveGood || digitalRead(24) == 0){
+    drivePower = 0;
+  }
+  arcadeDrive(drivePower, 0);
+  //Serial.println(digitalRead(24));
+  //Serial.println(drivePower);
+}
+
+
+
+
 bool driveInRange(int delay){
   return booleanDelay(driveGood,delay);
 }
 
-const double kP_Turn = 0.08;
+const double kP_Turn = 0.085; //old .08
+const double kTurnGoodRange = 2.5;
+
 double turnPower;
 bool turnGood = false;
 void turnAngle(int angle){
