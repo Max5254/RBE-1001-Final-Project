@@ -24,10 +24,9 @@ const int leftEncoderB = 3;
 const int rightEncoderA = 18;
 const int rightencoderB = 20;
 const int barnButton = 29;
-//Auto button is on 22;
+//Auto button pins are on 22 & 27;
 //Analog Input
 const int potPort = A0;
-// Auto pot is on A1
 
 ///////////////////
 // DEFINE MOTORS //
@@ -46,10 +45,7 @@ static Servo intake;
 const double kArmBottomSetpoint = 0.34;
 const double kArmMiddleSetpoint = 0.7;
 const double kArmTopSetpoint = 0.9;
-//Arm
-//Drive auto
 
-//Drive auto
 
 ///////////////
 // FUNCTIONS //
@@ -84,12 +80,10 @@ void driveDistance(double distance, double maxSpeed);
 bool turnInRange(int delay);
 void turnAngle(int angle);
 
+//ATUO
 void PENtoBARN(bool red);
 void PENtoPEN(bool red);
 void justBARN(bool red);
 void test(bool red);
-
-
-
 
 #endif

@@ -4,11 +4,12 @@ double servoToFrc(int input) { //Converts from a 0 to 180 scale to a -1 to 1 sca
   return ((input - 90.0) / 90.0);
 }
 
-int frcToServo(double input){
+int frcToServo(double input){ //Converts from -1 to 1 scale to a 0 180 sclase 
     return 90 + (input * 90.0);
 }
 
 unsigned int lastLatched;
+//return true only when a bool has been true for "delay" amount of time
 bool booleanDelay(bool latch, unsigned int delay){
   if(!latch){
     lastLatched = millis();

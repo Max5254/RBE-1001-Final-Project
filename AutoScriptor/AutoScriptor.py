@@ -1,5 +1,5 @@
 #VARIABLES TO SET
-fileName = "justBARN"   #file name
+fileName = "PENtoBARN"   #file name
 robotState = 0   #inital state for robot
 delayTime = 250  #time that all functions must be in range for before moving on (passed to the booleanDelay function of the PID loops)
 

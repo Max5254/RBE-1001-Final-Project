@@ -18,18 +18,14 @@
 
 // initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(40,41,42,43,44,45);
-int autoPotPin = A1;
+//vars for auto seleciton
 int autoButtonPin = 22, autoTogglePin = 27;
 bool colorRed;
-int currentAuto = 1, numAuto = 4;
-
-
+int currentAuto = 1, numAuto = 3;
 
 int ledpindebug = 13; //Wireless controller Debug pin. If lit then there is no communication.
 
 DFW dfw(ledpindebug);  // Instantiates the DFW object and setting the debug pin. The debug pin will be set high if no communication is seen after 2 seconds
-Servo rightmotor; // Servo object
-Servo leftmotor; // Servo object
 
 void setup() {
   Serial.begin(9600); // Serial output begin. Only needed for debug
@@ -45,20 +41,17 @@ void setup() {
   }
   // put your setup code here, to run once:
   initRobot();
-
 }
 
 void autonomous(volatile unsigned long time) // function definition
 {
   Serial.println("Waiting for start"); //prints Teleop over serial (usb com port)
   while (dfw.start() == 1) { // waits for start button
-    setAuto();
-    //printPot(0);
-    //Serial.println("waiting for start");
+    setAuto(); //pick auto before auto starts
     dfw.update();
     delay(20);
   }
-  dfw.end();
+  dfw.end(); //end dfw because it was cauing issues with our encoders
   Serial.println("Auto"); //prints Teleop over serial (usb com port)
   lcd.clear();
   resetEncoders();
@@ -68,18 +61,15 @@ void autonomous(volatile unsigned long time) // function definition
   {
     // The select button can be used to skip the autonomous code.
     // Enter Autonomous User Code Here
-    printEncoders(0);
-    printGyro(1);
-    autonomousPeriodic(colorRed, currentAuto);
+    printEncoders(0); //print encoders on LCD line 0
+    printGyro(1); //print gyro on LCD line 1
+    autonomousPeriodic(colorRed, currentAuto); //call auto with current color and selcted mode
 
-    //Serial.println("Autonomous"); //prints Autonomous over serial (usb com port)
     delay(20); //delay to prevent spamming the serial port and to keep servo and dfw libraries happy
 
   }
-  dfw.begin(9600,1);
+  dfw.begin(9600,1); //reconnect joystick for teleop
 }
-
-
 
 void teleop(unsigned long time) { // function definition
   Serial.println("TeleOp"); //prints Teleop over serial (usb com port)
@@ -91,10 +81,9 @@ void teleop(unsigned long time) { // function definition
     //tank drive code next 4 lines
     dfw.update();// Called to update the controllers output. Do not call faster than every 15ms.
     // Enter Teleop User Code Here
-    teleopPeriodic(dfw);
-    printEncoders(0);
-    printPot(1);
-    //lcd.print("Teleop");
+    teleopPeriodic(dfw); //call teleop function with the joystick
+    printEncoders(0); //print encoders on LCD line 0
+    printPot(1); //print arm pot on LCD line 1
 
     delay(20); //delay to prevent spamming the serial port
 
@@ -102,9 +91,7 @@ void teleop(unsigned long time) { // function definition
   exit(0); // exits program
 }
 
-
 void loop() {
-
   autonomous(20); //time in seconds to run autonomous code
   teleop(180); //time in seconds that teleop code will run
 }
@@ -113,63 +100,55 @@ void loop() {
 ///////////////////////
 //PRINTING TO THE LCD//
 ///////////////////////
-void printEncoders(int line){
+void printEncoders(int line){ //prints both encoder values on selected line
   lcd.setCursor(0, line);
   lcd.print((String)getLeftEncoder() + " , " + (String)getRightEncoder());
-  //lcd.setCursor(0, line + 1);
-  //lcd.print((String)getAverageEncoder());
 }
-void printGyro(int line){
+void printGyro(int line){ //prints gyro value on selected line
   lcd.setCursor(0, line);
   lcd.print("Gyro: " + (String)getGyro());
 }
-void printPot(int line){
+void printPot(int line){ //prints arm pot value on selected line
   lcd.setCursor(0, line);
   lcd.print("Pot: " + (String)getArm());
 }
 
-
-//TODO: make this be able to adapt to different amounts of auto modes
-//TODO: make this actually select an auto
 String desiredMode;
 bool buttonPressed, lastPressed;
-void setAuto(){
+void setAuto(){ //sets auto color and mode based on jumper and button
   //PRINTS THE AUTO MODE
   lcd.setCursor(0, 0);
   lcd.print("Auto: ");
   buttonPressed = digitalRead(autoTogglePin);
-
+  //toggle between your auto modes and display on LCD
   if(buttonPressed == 0 && lastPressed == 1){
     if(currentAuto == numAuto){
       currentAuto = 1;
     } else {
-    currentAuto += 1;
+      currentAuto += 1;
+      }
+    }
+    if (currentAuto == 1){
+      desiredMode = "PENtoBARN";
+    }
+    else if(currentAuto == 2){
+      desiredMode = "PENtoPEN ";
+    }
+    else if(currentAuto == 3){
+      desiredMode = "justBARN ";
+    }
+    lcd.setCursor(6, 0);
+    lcd.print(desiredMode);
+    lastPressed = buttonPressed;
+    //Prints and sets the color based on jumper value
+    lcd.setCursor(0, 1);
+    lcd.print("Color: ");
+    lcd.setCursor(7,  1);
+    if(digitalRead(autoButtonPin)){
+      lcd.print("RED ");
+      colorRed = true;
+    } else {
+      colorRed = false;
+      lcd.print("BLUE");
+    }
   }
-}
-  if (currentAuto == 1){
-    desiredMode = "PENtoBARN";
-  }
-  else if(currentAuto == 2){
-    desiredMode = "PENtoPEN ";
-  }
-  else if(currentAuto == 3){
-    desiredMode = "justBARN ";
-  }
-  else if(currentAuto == 4){
-    desiredMode = "test";
-  }
-  lcd.setCursor(6, 0);
-  lcd.print(desiredMode);
-  lastPressed = buttonPressed;
-  //PRINTS THE COLOR
-  lcd.setCursor(0, 1);
-  lcd.print("Color: ");
-  lcd.setCursor(7,  1);
-  if(digitalRead(autoButtonPin)){
-    lcd.print("RED ");
-    colorRed = true;
-  } else {
-    colorRed = false;
-    lcd.print("BLUE");
-  }
-}
